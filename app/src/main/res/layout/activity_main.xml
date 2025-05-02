@@ -76,7 +76,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="245dp"
-        android:backgroundTint="@color/black"/>
+        android:backgroundTint="@color/material_dynamic_tertiary70"/>
 
     <Button
         android:id="@+id/button2"
