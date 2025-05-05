@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
         map.onPause()
     }
 
-    // 👇 SIIRRETTY: nyt funktio on MainActivity-luokan sisällä
     private fun drawRoute(start: GeoPoint, end: GeoPoint) {
         val url = "https://router.project-osrm.org/route/v1/driving/" +
                 "${start.longitude},${start.latitude};${end.longitude},${end.latitude}" +
