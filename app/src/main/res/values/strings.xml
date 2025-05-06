@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">TekoalyMobiiliProjekti</string>
+
+    <string-array name="tahti">
+        <item>Rauhallisesti</item>
+        <item>Verkkaasti</item>
+        <item>Juosten</item>
+    </string-array>
+
+
 </resources>

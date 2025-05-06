@@ -13,12 +13,14 @@ import com.google.gson.JsonParser
 import org.osmdroid.views.overlay.Polyline
 import android.Manifest // manifestiin lisätty luvat -Henry
 import android.content.pm.PackageManager // -Henry
+import android.widget.TextView
 import androidx.core.app.ActivityCompat // -Henry
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay // sijainnin hakemiseen -Henry
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider // -Henry
 
 class KarttaActivity : AppCompatActivity() {
     private lateinit var map: MapView
+    lateinit var kilometrit : TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +49,13 @@ class KarttaActivity : AppCompatActivity() {
             // jos lupa myönnetty otetaan käyttöön // -Henry
             setupMyLocation()
         }
+
+        kilometrit = findViewById(R.id.kilometritTxt)
+
+        var tahti : String = intent.getStringExtra("Tahti").toString()
+        var aika : Double = intent.getDoubleExtra("Aika", 0.0)
+
+        val matka = laskeMatka(tahti, aika)
     }
 
     override fun onResume() {
@@ -116,4 +125,27 @@ class KarttaActivity : AppCompatActivity() {
             }
         }.start()
     }
+
+    //Laskee matkan ja näyttää sen valitussa kentässä
+    private fun laskeMatka(tahti: String, aika: Double){
+
+        val vauhtiMap = mapOf(
+            "Rauhallisesti" to 4.0,  // km/h
+            "Verkkaasti" to 6.0,
+            "Juosten" to 10.0
+        )
+
+        val nopeus = vauhtiMap[tahti]
+
+        if (nopeus != null) {
+            val aikaTunneissa = aika / 60.0
+            val matkaKm = nopeus * aikaTunneissa
+            val matkaMetreina = matkaKm * 1000
+
+
+            kilometrit.text = "%.2f".format(matkaMetreina / 1000)
+        } else {
+            kilometrit.text = "0"
+        }
+}
 }
