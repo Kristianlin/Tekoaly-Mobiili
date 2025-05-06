@@ -11,6 +11,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import com.google.gson.JsonParser
 import org.osmdroid.views.overlay.Polyline
+import android.Manifest // manifestiin lisätty luvat -Henry
+import android.content.pm.PackageManager // -Henry
+import androidx.core.app.ActivityCompat // -Henry
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay // sijainnin hakemiseen -Henry
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider // -Henry
 
 class KarttaActivity : AppCompatActivity() {
     private lateinit var map: MapView
@@ -33,6 +38,15 @@ class KarttaActivity : AppCompatActivity() {
         mapController.setCenter(startPoint)
 
         drawRoute(startPoint, endPoint) // <- Kutsu metodia täällä
+
+        // tarkistaa onko käyttäjältä lupa pyydetty sijainnin käyttämiseen // -Henry
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        } else {
+            // jos lupa myönnetty otetaan käyttöön // -Henry
+            setupMyLocation()
+        }
     }
 
     override fun onResume() {
@@ -43,6 +57,26 @@ class KarttaActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         map.onPause()
+    }
+
+    // Käsittelee lupapyynnön // -Henry
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            setupMyLocation()
+        }
+    }
+
+    // Asettaa sijainnin käyttäjälle // -Henry
+    private fun setupMyLocation() {
+        val locationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(this), map)
+        locationOverlay.enableMyLocation()
+        locationOverlay.enableFollowLocation()
+        map.overlays.add(locationOverlay)
     }
 
     private fun drawRoute(start: GeoPoint, end: GeoPoint) {
