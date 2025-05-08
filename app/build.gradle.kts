@@ -26,6 +26,11 @@ android {
             )
         }
     }
+
+    buildFeatures{
+
+        viewBinding = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -50,4 +55,6 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation ("com.github.MKergall:osmbonuspack:6.9.0")
+    implementation ("com.google.android.material:material:1.12.0")
+
 }

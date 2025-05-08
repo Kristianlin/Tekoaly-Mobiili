@@ -12,21 +12,44 @@ import okhttp3.Request
 import com.google.gson.JsonParser
 import org.osmdroid.views.overlay.Polyline
 import android.Manifest // manifestiin lisätty luvat -Henry
+import android.content.Intent
 import android.content.pm.PackageManager // -Henry
 import android.widget.TextView
 import androidx.core.app.ActivityCompat // -Henry
+import com.example.tekoalymobiiliprojekti.databinding.ActivityKarttaBinding
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay // sijainnin hakemiseen -Henry
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider // -Henry
+import com.example.tekoalymobiiliprojekti.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class KarttaActivity : AppCompatActivity() {
     private lateinit var map: MapView
     lateinit var kilometrit : TextView
+    private lateinit var binding: ActivityKarttaBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_kartta)
+
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNav.selectedItemId = R.id.map
+
+        bottomNav.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.map -> true // Olet jo täällä
+                R.id.home -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    finish()
+                    true
+                }
+                else -> false
+            }
+        }
 
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
-        setContentView(R.layout.activity_kartta)
+
 
         map = findViewById(R.id.mapView3)
         map.setTileSource(TileSourceFactory.MAPNIK)

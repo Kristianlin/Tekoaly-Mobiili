@@ -8,17 +8,54 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-
+import com.example.tekoalymobiiliprojekti.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     //Lupaus alustuksista
     lateinit var reittiBtn: Button
     lateinit var aika: EditText
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.bottomNavigationView.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.home -> {
+                    // Olet jo Home-aktiviteetissa
+                    true
+                }
+
+                R.id.map -> {
+                    val valittuAika: String = binding.aikaExt.text.toString()
+                    val valittuTahti = binding.tahtiSpinner.selectedItem.toString()
+
+                    val intentMatka = Intent(this, KarttaActivity::class.java).apply {
+                        if (valittuAika.isNotEmpty()) {
+                            putExtra("Aika", valittuAika.toDouble())
+                            putExtra("Tahti", valittuTahti)
+                        }
+                    }
+
+                    startActivity(intentMatka)
+                    overridePendingTransition(0, 0)
+                    finish()
+                    true
+                }
+
+                R.id.save -> {
+                    // Tulevaisuudessa: SaveActivity
+                    true
+                }
+
+                else -> false
+            }
+        }
+        // Asetetaan aloituspainike aktiiviseksi (korostaa sen navissa)
+        binding.bottomNavigationView.selectedItemId = R.id.home
 
         //Alustukset
         aika = findViewById(R.id.aikaExt)
@@ -51,11 +88,8 @@ class MainActivity : AppCompatActivity() {
             val intentMatka = Intent(this, KarttaActivity::class.java).apply {
                 putExtra("Aika", valittuAika.toDouble())
                 putExtra("Tahti", valittuTahti)
-
-
             }
             startActivity(intentMatka)
         }
-
     }
 }
