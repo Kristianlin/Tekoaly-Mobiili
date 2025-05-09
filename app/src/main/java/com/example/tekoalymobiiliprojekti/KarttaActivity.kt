@@ -12,9 +12,11 @@ import okhttp3.Request
 import com.google.gson.JsonParser
 import org.osmdroid.views.overlay.Polyline
 import android.Manifest // manifestiin lisätty luvat -Henry
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager // -Henry
 import android.widget.TextView
+
 import androidx.core.app.ActivityCompat // -Henry
 import com.example.tekoalymobiiliprojekti.databinding.ActivityKarttaBinding
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay // sijainnin hakemiseen -Henry
@@ -23,6 +25,16 @@ import com.example.tekoalymobiiliprojekti.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class KarttaActivity : AppCompatActivity() {
+
+
+    private val greetings = listOf(
+        "Liikkumisen iloa!",
+        "Avoimin mielin, kevein askelin!",
+        "Hyvää treeniä!",
+        "Sinä liikut, kehosi kiittää!",
+        "Tsemppiä reitille!"
+    )
+
     private lateinit var map: MapView
     lateinit var kilometrit : TextView
     private lateinit var binding: ActivityKarttaBinding
@@ -31,6 +43,12 @@ class KarttaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kartta)
+
+        val greeting = greetings.random()  //tervehdys toiminta
+        val greetingText = findViewById<TextView>(R.id.greetingText)
+        greetingText.text = greeting
+
+
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNav.selectedItemId = R.id.map
@@ -171,4 +189,7 @@ class KarttaActivity : AppCompatActivity() {
             kilometrit.text = "0"
         }
 }
+
+
+
 }
