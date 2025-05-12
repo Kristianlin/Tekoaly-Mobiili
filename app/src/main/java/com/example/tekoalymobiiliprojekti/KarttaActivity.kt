@@ -12,20 +12,26 @@ import okhttp3.Request
 import com.google.gson.JsonParser
 import org.osmdroid.views.overlay.Polyline
 import android.Manifest // manifestiin lisätty luvat -Henry
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager // -Henry
 import android.widget.TextView
-
 import androidx.core.app.ActivityCompat // -Henry
 import com.example.tekoalymobiiliprojekti.databinding.ActivityKarttaBinding
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay // sijainnin hakemiseen -Henry
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider // -Henry
 import com.example.tekoalymobiiliprojekti.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.osmdroid.bonuspack.routing.OSRMRoadManager
+import org.osmdroid.bonuspack.routing.Road
+import org.osmdroid.bonuspack.routing.RoadManager
+import android.widget.Toast
+import android.graphics.Color
+import kotlin.math.*
+import kotlin.random.Random
+import android.content.Context
+
 
 class KarttaActivity : AppCompatActivity() {
-
 
     private val greetings = listOf(
         "Liikkumisen iloa!",
@@ -47,8 +53,6 @@ class KarttaActivity : AppCompatActivity() {
         val greeting = greetings.random()  //tervehdys toiminta
         val greetingText = findViewById<TextView>(R.id.greetingText)
         greetingText.text = greeting
-
-
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNav.selectedItemId = R.id.map
@@ -76,11 +80,6 @@ class KarttaActivity : AppCompatActivity() {
 
         val mapController = map.controller
         mapController.setZoom(13.0)
-        val startPoint = GeoPoint(60.1699, 24.9384) // Helsinki
-        val endPoint = GeoPoint(60.2055, 24.6559)   // Espoo
-        mapController.setCenter(startPoint)
-
-        drawRoute(startPoint, endPoint) // <- Kutsu metodia täällä
 
         // tarkistaa onko käyttäjältä lupa pyydetty sijainnin käyttämiseen // -Henry
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -127,48 +126,109 @@ class KarttaActivity : AppCompatActivity() {
         locationOverlay.enableMyLocation()
         locationOverlay.enableFollowLocation()
         map.overlays.add(locationOverlay)
+
+        // Kun käyttäjän sijainti on ensimmäisen kerran saatu, suoritetaan tämä osio
+        locationOverlay.runOnFirstFix {
+            val currentLocation = locationOverlay.myLocation
+            val startPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
+
+            // Haetaan käyttäjän syöttämä aika ja tahti
+            val aika = intent.getDoubleExtra("Aika", 0.0)
+            val tahti = intent.getStringExtra("Tahti") ?: "Rauhallisesti"
+            val haluttuMatkaKm = laskeMatka(tahti, aika)
+
+            // Haetaan useista reiteistä satunnaisilla suunnilla
+            val roadManager = OSRMRoadManager(this, "TekoalyApp")
+            val candidateRoutes = mutableListOf<Pair<GeoPoint, Road>>()
+
+            val numberOfCandidates = 12
+            repeat(numberOfCandidates) {
+                val randomAngle = Random.nextDouble(0.0, 360.0)
+                val variableDistance = haluttuMatkaKm * Random.nextDouble(0.6, 0.9)
+                val end = LuoPaatepiste(startPoint, variableDistance, randomAngle)
+                val route = roadManager.getRoad(arrayListOf(startPoint, end))
+
+                if (route.mStatus == Road.STATUS_OK) {
+                    candidateRoutes.add(Pair(end, route))
+                }
+            }
+
+            // Valitaan reitti, jonka pituus on lähimpänä haluttua matkaa
+            val best = candidateRoutes.minByOrNull { kotlin.math.abs(it.second.mLength - haluttuMatkaKm) }
+
+            if (best != null) {
+                runOnUiThread {
+                    drawRoute(startPoint, best.first)
+                    kilometrit.text = "%.2f".format(best.second.mLength)
+                }
+            } else {
+                runOnUiThread {
+                    Toast.makeText(this, "Reitin haku epäonnistui", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
+    // Piirretään reitti kartalle ja luodaan infokuplat
     private fun drawRoute(start: GeoPoint, end: GeoPoint) {
-        val url = "https://router.project-osrm.org/route/v1/driving/" +
-                "${start.longitude},${start.latitude};${end.longitude},${end.latitude}" +
-                "?overview=full&geometries=geojson"
-
-        val client = OkHttpClient()
-        val request = Request.Builder().url(url).build()
-
         Thread {
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val json = JsonParser.parseString(response.body?.string()).asJsonObject
-                    val coords = json["routes"].asJsonArray[0]
-                        .asJsonObject["geometry"]
-                        .asJsonObject["coordinates"]
-                        .asJsonArray
+            try {
+                val roadManager = OSRMRoadManager(this, "TekoalyApp")
+                roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
+                val waypoints = arrayListOf(start, end)
+                val road: Road = roadManager.getRoad(waypoints)
 
-                    val geoPoints = coords.map { coordElement ->
-                        val coordArray = coordElement.asJsonArray
-                        val lon = coordArray[0].asDouble
-                        val lat = coordArray[1].asDouble
-                        GeoPoint(lat, lon)
+                runOnUiThread {
+                    if (road.mStatus != Road.STATUS_OK) {
+                        Toast.makeText(this, "Reitin haku epäonnistui", Toast.LENGTH_SHORT).show()
+                        return@runOnUiThread
                     }
 
-                    runOnUiThread {
-                        val line = Polyline().apply {
-                            setPoints(geoPoints)
-                            color = android.graphics.Color.BLUE
-                            width = 8f
-                        }
-                        map.overlays.add(line)
-                        map.invalidate()
+                    val roadOverlay = RoadManager.buildRoadOverlay(road)
+                    roadOverlay.color = Color.BLUE
+                    roadOverlay.width = 8f
+                    map.overlays.add(roadOverlay)
+
+                    // Lisätään markerit ohjeiden kohdalle
+                    for ((index, node) in road.mNodes.withIndex()) {
+                        val nodeMarker = Marker(map)
+                        nodeMarker.position = node.mLocation
+                        nodeMarker.title = "Ohje ${index + 1}"
+                        nodeMarker.snippet = node.mInstructions
+                        nodeMarker.subDescription = Road.getLengthDurationText(this, node.mLength, node.mDuration)
+                        nodeMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        map.overlays.add(nodeMarker)
                     }
+
+                    map.invalidate()
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, "Virhe reittiä laskettaessa: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }.start()
     }
 
+    // Hakee uuden sijainnin  annetusta lähtöpisteestä
+    fun LuoPaatepiste(start: GeoPoint, distanceKm: Double, bearingDegrees: Double): GeoPoint {
+        val R = 6371.0
+        val bearing = Math.toRadians(bearingDegrees)
+        val lat1 = Math.toRadians(start.latitude)
+        val lon1 = Math.toRadians(start.longitude)
+
+        val lat2 = asin(sin(lat1) * cos(distanceKm / R) +
+                cos(lat1) * sin(distanceKm / R) * cos(bearing))
+        val lon2 = lon1 + atan2(
+            sin(bearing) * sin(distanceKm / R) * cos(lat1),
+            cos(distanceKm / R) - sin(lat1) * sin(lat2)
+        )
+
+        return GeoPoint(Math.toDegrees(lat2), Math.toDegrees(lon2))
+    }
+
     //Laskee matkan ja näyttää sen valitussa kentässä
-    private fun laskeMatka(tahti: String, aika: Double){
+    private fun laskeMatka(tahti: String, aika: Double): Double {
 
         val vauhtiMap = mapOf(
             "Rauhallisesti" to 4.0,  // km/h
@@ -183,13 +243,11 @@ class KarttaActivity : AppCompatActivity() {
             val matkaKm = nopeus * aikaTunneissa
             val matkaMetreina = matkaKm * 1000
 
-
             kilometrit.text = "%.2f".format(matkaMetreina / 1000)
+            return matkaKm
         } else {
             kilometrit.text = "0"
+            return 0.0
         }
-}
-
-
-
+    }
 }
