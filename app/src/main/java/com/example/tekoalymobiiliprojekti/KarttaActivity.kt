@@ -31,7 +31,7 @@ import kotlin.random.Random
 import android.content.Context
 
 
-class KarttaActivity : AppCompatActivity() {
+class KarttaActivity : BaseActivity() {
 
     private val greetings = listOf(
         "Liikkumisen iloa!",
@@ -48,13 +48,14 @@ class KarttaActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_kartta)
+        //setContentView(R.layout.activity_kartta)
+        setContent(R.layout.activity_kartta)
 
         val greeting = greetings.random()  //tervehdys toiminta
         val greetingText = findViewById<TextView>(R.id.greetingText)
         greetingText.text = greeting
 
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        /*val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNav.selectedItemId = R.id.map
 
         bottomNav.setOnItemSelectedListener {
@@ -68,7 +69,7 @@ class KarttaActivity : AppCompatActivity() {
                 }
                 else -> false
             }
-        }
+        }*/
 
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
 

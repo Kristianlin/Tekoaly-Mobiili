@@ -11,7 +11,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.tekoalymobiiliprojekti.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     //Lupaus alustuksista
     lateinit var reittiBtn: Button
@@ -20,7 +20,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        setContent(R.layout.activity_main)
+
+       /* binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         //menun avaus ja sulkeminen
@@ -68,7 +71,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         // Asetetaan aloituspainike aktiiviseksi (korostaa sen navissa)
-        binding.bottomNavigation.selectedItemId = R.id.home
+        binding.bottomNavigation.selectedItemId = R.id.home*/
 
         //Alustukset
         aika = findViewById(R.id.aikaExt)
