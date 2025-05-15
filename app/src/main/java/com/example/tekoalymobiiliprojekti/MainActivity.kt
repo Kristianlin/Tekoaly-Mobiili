@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.tekoalymobiiliprojekti.databinding.ActivityMainBinding
 
@@ -22,7 +23,19 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.bottomNavigationView.setOnItemSelectedListener {
+        //menun avaus ja sulkeminen
+        val drawerLayout = binding.main
+        val toggle = ActionBarDrawerToggle(
+            this,
+            drawerLayout,
+            binding.toolbar,
+            R.string.open_nav,
+            R.string.close_nav
+        )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        binding.bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> {
                     // Olet jo Home-aktiviteetissa
@@ -55,7 +68,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         // Asetetaan aloituspainike aktiiviseksi (korostaa sen navissa)
-        binding.bottomNavigationView.selectedItemId = R.id.home
+        binding.bottomNavigation.selectedItemId = R.id.home
 
         //Alustukset
         aika = findViewById(R.id.aikaExt)
