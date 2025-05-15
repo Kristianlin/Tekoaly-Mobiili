@@ -139,26 +139,37 @@ class KarttaActivity : AppCompatActivity() {
 
             // Haetaan useista reiteistä satunnaisilla suunnilla
             val roadManager = OSRMRoadManager(this, "TekoalyApp")
-            val candidateRoutes = mutableListOf<Pair<GeoPoint, Road>>()
+            val candidateRoutes = mutableListOf<Pair<List<GeoPoint>, Road>>()
+            roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
 
             val numberOfCandidates = 12
             repeat(numberOfCandidates) {
-                val randomAngle = Random.nextDouble(0.0, 360.0)
-                val variableDistance = haluttuMatkaKm * Random.nextDouble(0.6, 0.9)
-                val end = LuoPaatepiste(startPoint, variableDistance, randomAngle)
-                val route = roadManager.getRoad(arrayListOf(startPoint, end))
+                val angle1 = Random.nextDouble(0.0, 360.0)
+                val angle2 = (angle1 + Random.nextDouble(60.0, 120.0)) % 360  // eri suuntaan kuin 1. piste
+                val angle3 = (angle2 + Random.nextDouble(60.0, 90.0)) % 360
+                val angle4 = (angle3 + Random.nextDouble(60.0, 90.0)) % 360
 
-                if (route.mStatus == Road.STATUS_OK) {
-                    candidateRoutes.add(Pair(end, route))
+                val legDistance = haluttuMatkaKm / 5.0 * 0.8  // viisi etappia: 4 välietappia + paluu
+
+                val waypoint1 = LuoPaatepiste(startPoint, legDistance, angle1)
+                val waypoint2 = LuoPaatepiste(waypoint1, legDistance, angle2)
+                val waypoint3 = LuoPaatepiste(waypoint2, legDistance, angle3)
+                val waypoint4 = LuoPaatepiste(waypoint3, legDistance, angle4)
+
+                val waypoints = arrayListOf(startPoint, waypoint1, waypoint2, waypoint3, waypoint4, startPoint)
+                val road = roadManager.getRoad(waypoints)
+
+                if (road.mStatus == Road.STATUS_OK) {
+                    candidateRoutes.add(Pair(waypoints, road))
                 }
             }
 
             // Valitaan reitti, jonka pituus on lähimpänä haluttua matkaa
-            val best = candidateRoutes.minByOrNull { kotlin.math.abs(it.second.mLength - haluttuMatkaKm) }
+            val best = candidateRoutes.minByOrNull { abs(it.second.mLength - haluttuMatkaKm) }
 
             if (best != null) {
                 runOnUiThread {
-                    drawRoute(startPoint, best.first)
+                    drawRoute(best.first)
                     kilometrit.text = "%.2f".format(best.second.mLength)
                 }
             } else {
@@ -170,13 +181,12 @@ class KarttaActivity : AppCompatActivity() {
     }
 
     // Piirretään reitti kartalle ja luodaan infokuplat
-    private fun drawRoute(start: GeoPoint, end: GeoPoint) {
+    private fun drawRoute(points: List<GeoPoint>) {
         Thread {
             try {
                 val roadManager = OSRMRoadManager(this, "TekoalyApp")
                 roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
-                val waypoints = arrayListOf(start, end)
-                val road: Road = roadManager.getRoad(waypoints)
+                val road: Road = roadManager.getRoad(ArrayList(points))
 
                 runOnUiThread {
                     if (road.mStatus != Road.STATUS_OK) {
