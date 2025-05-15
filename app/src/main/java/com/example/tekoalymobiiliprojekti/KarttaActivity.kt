@@ -143,6 +143,26 @@ class KarttaActivity : BaseActivity() {
             val candidateRoutes = mutableListOf<Pair<List<GeoPoint>, Road>>()
             roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
 
+            // Piirretään edestakaisin reitti, jos reitti on liian lyhyt
+            if (haluttuMatkaKm < 1.2) {
+                val suunta = Random.nextDouble(0.0, 360.0)
+                val edesTakaisin = haluttuMatkaKm / 2.5
+                val puolimatka = LuoPaatepiste(startPoint, edesTakaisin, suunta)
+                val waypoints = arrayListOf(startPoint, puolimatka, startPoint)
+
+                val road = roadManager.getRoad(waypoints)
+
+                runOnUiThread {
+                    if (road.mStatus == Road.STATUS_OK) {
+                        drawRoute(waypoints)
+                        kilometrit.text = "%.2f".format(road.mLength)
+                    } else {
+                        Toast.makeText(this, "Reitin haku epäonnistui", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                return@runOnFirstFix
+            }
+
             val numberOfCandidates = 12
             repeat(numberOfCandidates) {
                 val angle1 = Random.nextDouble(0.0, 360.0)
