@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@drawable/background_img">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,47 +11,74 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/textView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="MINNE TÄNÄÄN LENKKEILLÄÄN?"
-            android:textAlignment="center"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="@drawable/card_background"
+            android:elevation="8dp"
+            android:layout_margin="8dp">
 
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Kuinka kauan haluat lenkin kestävän?" />
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MINNE TÄNÄÄN LENKKEILLÄÄN?"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginBottom="12dp"/>
 
-        <EditText
-            android:id="@+id/aikaExt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Aika minuutteina"
-            android:inputType="number" />
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kuinka kauan haluat lenkin kestävän?"
+                android:textColor="#424242"
+                android:textSize="16sp"
+                android:layout_marginTop="12dp"/>
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Millaisella tahdilla jaksat tänään mennä?" />
+            <EditText
+                android:id="@+id/aikaExt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Aika minuutteina"
+                android:inputType="number"
+                android:background="@drawable/input_background"
+                android:padding="12dp"
+                android:layout_marginTop="6dp"
+                android:textColor="#000000"/>
 
-        <Spinner
-            android:id="@+id/tahtiSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Millaisella tahdilla jaksat tänään mennä?"
+                android:textColor="#424242"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"/>
 
-        <Button
-            android:id="@+id/laskeReittiBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Laske reitti"
-            android:layout_marginTop="24dp" />
+            <Spinner
+                android:id="@+id/tahtiSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/spinner_background"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/laskeReittiBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Laske reitti"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/btn_background"
+                android:textColor="#FFFFFF"
+                android:elevation="6dp"
+                android:stateListAnimator="@null"/>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
+
