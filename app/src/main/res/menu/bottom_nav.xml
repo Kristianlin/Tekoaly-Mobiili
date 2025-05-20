@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Home"
+    <item android:title="Koti"
         android:id="@+id/home"
         android:icon="@drawable/baseline_home_24"/>
-    <item android:title="Map"
+    <item android:title="Kartta"
         android:id="@+id/map"
-        android:icon="@drawable/baseline_accessibility_24"
+        android:icon="@drawable/baseline_map_24"
         />
-    <item android:title="Save"
+    <item android:title="Muistio"
         android:id="@+id/save"
         android:icon="@drawable/baseline_archive_24"
         />
