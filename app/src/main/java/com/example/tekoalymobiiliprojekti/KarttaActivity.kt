@@ -29,6 +29,9 @@ import android.graphics.Color
 import kotlin.math.*
 import kotlin.random.Random
 import android.content.Context
+import java.util.ArrayList
+import androidx.core.content.ContextCompat
+
 
 
 class KarttaActivity : BaseActivity() {
@@ -147,7 +150,7 @@ class KarttaActivity : BaseActivity() {
             if (haluttuMatkaKm < 1.2) {
                 val suunta = Random.nextDouble(0.0, 360.0)
                 val edesTakaisin = haluttuMatkaKm / 2.5
-                val puolimatka = LuoPaatepiste(startPoint, edesTakaisin, suunta)
+                val puolimatka = LuoPaatepiste(startPoint, edesTakaisin, suunta, this) ?: return@runOnFirstFix
                 val waypoints = arrayListOf(startPoint, puolimatka, startPoint)
 
                 val road = roadManager.getRoad(waypoints)
@@ -163,19 +166,19 @@ class KarttaActivity : BaseActivity() {
                 return@runOnFirstFix
             }
 
-            val numberOfCandidates = 12
+            val numberOfCandidates = 8
             repeat(numberOfCandidates) {
                 val angle1 = Random.nextDouble(0.0, 360.0)
-                val angle2 = (angle1 + Random.nextDouble(60.0, 120.0)) % 360  // eri suuntaan kuin 1. piste
+                val angle2 = (angle1 + Random.nextDouble(60.0, 90.0)) % 360  // eri suuntaan kuin 1. piste
                 val angle3 = (angle2 + Random.nextDouble(60.0, 90.0)) % 360
                 val angle4 = (angle3 + Random.nextDouble(60.0, 90.0)) % 360
 
-                val legDistance = haluttuMatkaKm / 5.0 * 0.8  // viisi etappia: 4 välietappia + paluu
+                val legDistance = haluttuMatkaKm / 5.0 * 0.9
 
-                val waypoint1 = LuoPaatepiste(startPoint, legDistance, angle1)
-                val waypoint2 = LuoPaatepiste(waypoint1, legDistance, angle2)
-                val waypoint3 = LuoPaatepiste(waypoint2, legDistance, angle3)
-                val waypoint4 = LuoPaatepiste(waypoint3, legDistance, angle4)
+                val waypoint1 = LuoPaatepiste(startPoint, legDistance, angle1, this) ?: return@repeat
+                val waypoint2 = LuoPaatepiste(waypoint1, legDistance, angle2, this) ?: return@repeat
+                val waypoint3 = LuoPaatepiste(waypoint2, legDistance, angle3, this) ?: return@repeat
+                val waypoint4 = LuoPaatepiste(waypoint3, legDistance, angle4, this) ?: return@repeat
 
                 val waypoints = arrayListOf(startPoint, waypoint1, waypoint2, waypoint3, waypoint4, startPoint)
                 val road = roadManager.getRoad(waypoints)
@@ -220,15 +223,26 @@ class KarttaActivity : BaseActivity() {
                     roadOverlay.width = 8f
                     map.overlays.add(roadOverlay)
 
-                    // Lisätään markerit ohjeiden kohdalle
-                    for ((index, node) in road.mNodes.withIndex()) {
-                        val nodeMarker = Marker(map)
-                        nodeMarker.position = node.mLocation
-                        nodeMarker.title = "Ohje ${index + 1}"
-                        nodeMarker.snippet = node.mInstructions
-                        nodeMarker.subDescription = Road.getLengthDurationText(this, node.mLength, node.mDuration)
-                        nodeMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        map.overlays.add(nodeMarker)
+                    // Lisää markkeri lähtöpisteelle
+                    if (road.mNodes.isNotEmpty()) {
+                        val startNode = road.mNodes.first()
+                        val startMarker = Marker(map)
+                        startMarker.position = startNode.mLocation
+                        startMarker.title = "Lähtöpiste"
+                        startMarker.snippet = "Tämä on lähtö- ja paluupiste"
+                        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        //startMarker.icon = ContextCompat.getDrawable(this, R.drawable.start_flag)
+                        map.overlays.add(startMarker)
+                    }
+
+                    // Lisää markerit waypointeille
+                    for (i in 1 until points.size - 1) {
+                        val point = points[i]
+                        val marker = Marker(map)
+                        marker.position = point
+                        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        marker.title = "${i}. Rasti"
+                        map.overlays.add(marker)
                     }
 
                     map.invalidate()
@@ -241,22 +255,54 @@ class KarttaActivity : BaseActivity() {
         }.start()
     }
 
-    // Hakee uuden sijainnin  annetusta lähtöpisteestä
-    fun LuoPaatepiste(start: GeoPoint, distanceKm: Double, bearingDegrees: Double): GeoPoint {
+    // Luo piste X km päässä tietä pitkin satunnaisessa suunnassa
+    fun LuoPaatepiste(
+        start: GeoPoint,
+        distanceKm: Double,
+        bearingDegrees: Double,
+        context: Context
+    ): GeoPoint? {
         val R = 6371.0
         val bearing = Math.toRadians(bearingDegrees)
         val lat1 = Math.toRadians(start.latitude)
         val lon1 = Math.toRadians(start.longitude)
 
-        val lat2 = asin(sin(lat1) * cos(distanceKm / R) +
-                cos(lat1) * sin(distanceKm / R) * cos(bearing))
+        val lat2 = asin(
+            sin(lat1) * cos(distanceKm / R) +
+                    cos(lat1) * sin(distanceKm / R) * cos(bearing)
+        )
         val lon2 = lon1 + atan2(
             sin(bearing) * sin(distanceKm / R) * cos(lat1),
             cos(distanceKm / R) - sin(lat1) * sin(lat2)
         )
 
-        return GeoPoint(Math.toDegrees(lat2), Math.toDegrees(lon2))
+        val arvioituPiste = GeoPoint(Math.toDegrees(lat2), Math.toDegrees(lon2))
+        val roadManager = OSRMRoadManager(context, "TekoalyApp")
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
+
+        val reitti = roadManager.getRoad(arrayListOf(start, arvioituPiste))
+        if (reitti.mStatus != Road.STATUS_OK) return null
+
+        var kertynyt = 0.0
+        val tavoite = distanceKm * 1000  // metreinä
+        val pisteet = reitti.mRouteHigh.filterIndexed { index, point ->
+            if (index == 0) return@filterIndexed true
+            val dist = point.distanceToAsDouble(reitti.mRouteHigh[index - 1])
+            dist > 3.0  // suodatetaan pois alle 5 metrin loikat
+        }
+        for (i in 1 until pisteet.size) {
+            val a = pisteet[i - 1]
+            val b = pisteet[i]
+            val segment = a.distanceToAsDouble(b)
+            kertynyt += segment
+            if (kertynyt >= tavoite) {
+                return b
+            }
+        }
+
+        return pisteet.lastOrNull() // fallback jos ei muuten löydy
     }
+
 
     //Laskee matkan ja näyttää sen valitussa kentässä
     private fun laskeMatka(tahti: String, aika: Double): Double {
