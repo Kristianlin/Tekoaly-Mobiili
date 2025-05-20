@@ -14,13 +14,15 @@ import androidx.appcompat.widget.Toolbar
 import android.content.Intent
 import android.view.MenuItem
 
-open class BaseActivity : AppCompatActivity() {
+open abstract class BaseActivity : AppCompatActivity() {
 
     lateinit var drawerLayout: DrawerLayout
     lateinit var navigationView: NavigationView
     lateinit var bottomNav: BottomNavigationView
     lateinit var toolbar: Toolbar
     lateinit var toggle: ActionBarDrawerToggle
+
+    abstract fun getSelectedBottomNavItemId(): Int
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,17 +66,22 @@ open class BaseActivity : AppCompatActivity() {
         //Ala navin toiminnallisuus
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.home-> {
-                    startActivity(Intent(this, MainActivity::class.java))
+                R.id.home -> {
+                    if (getSelectedBottomNavItemId() != R.id.home) {
+                        startActivity(Intent(this, MainActivity::class.java))
+                    }
                     true
                 }
                 R.id.map -> {
-                    startActivity(Intent(this, KarttaActivity::class.java))
+                    if (getSelectedBottomNavItemId() != R.id.map) {
+                        startActivity(Intent(this, KarttaActivity::class.java))
+                    }
                     true
                 }
-
                 R.id.save -> {
-                    startActivity(Intent(this, MuistioActivity::class.java))
+                    if (getSelectedBottomNavItemId() != R.id.save) {
+                        startActivity(Intent(this, MuistioActivity::class.java))
+                    }
                     true
                 }
                 else -> false
@@ -82,6 +89,10 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        bottomNav.selectedItemId = getSelectedBottomNavItemId()
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (toggle.onOptionsItemSelected(item)) {

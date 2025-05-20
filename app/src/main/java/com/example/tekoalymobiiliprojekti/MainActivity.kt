@@ -18,6 +18,7 @@ class MainActivity : BaseActivity() {
     lateinit var aika: EditText
     private lateinit var binding: ActivityMainBinding
 
+    override fun getSelectedBottomNavItemId(): Int = R.id.home
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

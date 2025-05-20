@@ -48,7 +48,7 @@ class KarttaActivity : BaseActivity() {
     lateinit var kilometrit : TextView
     private lateinit var binding: ActivityKarttaBinding
 
-
+    override fun getSelectedBottomNavItemId(): Int = R.id.map
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_kartta)
