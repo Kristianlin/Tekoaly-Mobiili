@@ -16,6 +16,9 @@
         android:theme="@style/Theme.TekoalyMobiiliProjekti"
         tools:targetApi="31">
         <activity
+            android:name=".MuistioActivity"
+            android:exported="false" />
+        <activity
             android:name=".BaseActivity"
             android:exported="false" />
         <activity

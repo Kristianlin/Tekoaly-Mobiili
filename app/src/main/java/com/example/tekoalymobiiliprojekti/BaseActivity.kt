@@ -53,6 +53,11 @@ open class BaseActivity : AppCompatActivity() {
                     startActivity(Intent(this, KarttaActivity::class.java))
                     true
                 }
+
+                R.id.save -> {
+                    startActivity(Intent(this, MuistioActivity::class.java))
+                    true
+                }
                 else -> false
             }.also { drawerLayout.closeDrawers() }
         }
@@ -65,6 +70,11 @@ open class BaseActivity : AppCompatActivity() {
                 }
                 R.id.map -> {
                     startActivity(Intent(this, KarttaActivity::class.java))
+                    true
+                }
+
+                R.id.save -> {
+                    startActivity(Intent(this, MuistioActivity::class.java))
                     true
                 }
                 else -> false
