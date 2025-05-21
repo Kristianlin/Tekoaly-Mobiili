@@ -20,6 +20,22 @@
         app:layout_constraintVertical_bias="0.05" />
 
     <TextView
+        android:id="@+id/loadingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#AA000000"
+        android:padding="12dp"
+        android:text="Ladataan reittiä..."
+        android:textColor="@android:color/white"
+        android:visibility="gone"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/kilometritTxt"
+        app:layout_constraintEnd_toEndOf="@+id/mapView3"
+        app:layout_constraintStart_toStartOf="@+id/mapView3"
+        app:layout_constraintTop_toTopOf="@+id/mapView3" />
+
+    <TextView
         android:id="@+id/textView2"
         android:layout_width="106dp"
         android:layout_height="33dp"
@@ -65,14 +81,44 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
-        android:textSize="18sp"
         android:textColor="@android:color/black"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.8" />
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.828" />
 
+    <Button
+        android:id="@+id/btnHaeUusi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/btn_background"
+        android:elevation="6dp"
+        android:stateListAnimator="@null"
+        android:text="Hae uusi"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+    <Button
+        android:id="@+id/btnTyhjenna"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        android:background="@drawable/btn_background"
+        android:elevation="6dp"
+        android:stateListAnimator="@null"
+        android:text="Tyhjennä"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

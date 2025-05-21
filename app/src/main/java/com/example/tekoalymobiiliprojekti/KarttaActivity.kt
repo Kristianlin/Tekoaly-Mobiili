@@ -31,6 +31,8 @@ import kotlin.random.Random
 import android.content.Context
 import java.util.ArrayList
 import androidx.core.content.ContextCompat
+import android.widget.Button
+import android.view.View
 
 
 
@@ -47,6 +49,9 @@ class KarttaActivity : BaseActivity() {
     private lateinit var map: MapView
     lateinit var kilometrit : TextView
     private lateinit var binding: ActivityKarttaBinding
+
+    private lateinit var roadManager: OSRMRoadManager
+    private lateinit var loadingText: TextView
 
     override fun getSelectedBottomNavItemId(): Int = R.id.map
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +81,9 @@ class KarttaActivity : BaseActivity() {
 
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
 
+        roadManager = OSRMRoadManager(this, "TekoalyApp")
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
+
 
         map = findViewById(R.id.mapView3)
         map.setTileSource(TileSourceFactory.MAPNIK)
@@ -96,10 +104,22 @@ class KarttaActivity : BaseActivity() {
 
         kilometrit = findViewById(R.id.kilometritTxt)
 
-        var tahti : String = intent.getStringExtra("Tahti").toString()
-        var aika : Double = intent.getDoubleExtra("Aika", 0.0)
+        val btnHaeUusi = findViewById<Button>(R.id.btnHaeUusi)
+        val btnTyhjenna = findViewById<Button>(R.id.btnTyhjenna)
+        loadingText = findViewById(R.id.loadingText)
 
-        val matka = laskeMatka(tahti, aika)
+        btnHaeUusi.setOnClickListener {
+            map.overlays.clear()
+            map.invalidate()
+            loadingText.visibility = View.VISIBLE
+            setupMyLocation()
+        }
+
+        btnTyhjenna.setOnClickListener {
+            map.overlays.clear()
+            map.invalidate()
+            kilometrit.text = "0"
+        }
     }
 
     override fun onResume() {
@@ -142,7 +162,6 @@ class KarttaActivity : BaseActivity() {
             val haluttuMatkaKm = laskeMatka(tahti, aika)
 
             // Haetaan useista reiteistä satunnaisilla suunnilla
-            val roadManager = OSRMRoadManager(this, "TekoalyApp")
             val candidateRoutes = mutableListOf<Pair<List<GeoPoint>, Road>>()
             roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
 
@@ -150,7 +169,7 @@ class KarttaActivity : BaseActivity() {
             if (haluttuMatkaKm < 1.2) {
                 val suunta = Random.nextDouble(0.0, 360.0)
                 val edesTakaisin = haluttuMatkaKm / 2.5
-                val puolimatka = LuoPaatepiste(startPoint, edesTakaisin, suunta, this) ?: return@runOnFirstFix
+                val puolimatka = LuoPaatepiste(startPoint, edesTakaisin, suunta) ?: return@runOnFirstFix
                 val waypoints = arrayListOf(startPoint, puolimatka, startPoint)
 
                 val road = roadManager.getRoad(waypoints)
@@ -159,6 +178,7 @@ class KarttaActivity : BaseActivity() {
                     if (road.mStatus == Road.STATUS_OK) {
                         drawRoute(waypoints)
                         kilometrit.text = "%.2f".format(road.mLength)
+                        loadingText.visibility = View.GONE
                     } else {
                         Toast.makeText(this, "Reitin haku epäonnistui", Toast.LENGTH_SHORT).show()
                     }
@@ -175,10 +195,10 @@ class KarttaActivity : BaseActivity() {
 
                 val legDistance = haluttuMatkaKm / 5.0 * 0.9
 
-                val waypoint1 = LuoPaatepiste(startPoint, legDistance, angle1, this) ?: return@repeat
-                val waypoint2 = LuoPaatepiste(waypoint1, legDistance, angle2, this) ?: return@repeat
-                val waypoint3 = LuoPaatepiste(waypoint2, legDistance, angle3, this) ?: return@repeat
-                val waypoint4 = LuoPaatepiste(waypoint3, legDistance, angle4, this) ?: return@repeat
+                val waypoint1 = LuoPaatepiste(startPoint, legDistance, angle1) ?: return@repeat
+                val waypoint2 = LuoPaatepiste(waypoint1, legDistance, angle2) ?: return@repeat
+                val waypoint3 = LuoPaatepiste(waypoint2, legDistance, angle3) ?: return@repeat
+                val waypoint4 = LuoPaatepiste(waypoint3, legDistance, angle4) ?: return@repeat
 
                 val waypoints = arrayListOf(startPoint, waypoint1, waypoint2, waypoint3, waypoint4, startPoint)
                 val road = roadManager.getRoad(waypoints)
@@ -208,13 +228,13 @@ class KarttaActivity : BaseActivity() {
     private fun drawRoute(points: List<GeoPoint>) {
         Thread {
             try {
-                val roadManager = OSRMRoadManager(this, "TekoalyApp")
                 roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
                 val road: Road = roadManager.getRoad(ArrayList(points))
 
                 runOnUiThread {
                     if (road.mStatus != Road.STATUS_OK) {
                         Toast.makeText(this, "Reitin haku epäonnistui", Toast.LENGTH_SHORT).show()
+                        loadingText.visibility = View.GONE
                         return@runOnUiThread
                     }
 
@@ -245,11 +265,13 @@ class KarttaActivity : BaseActivity() {
                         map.overlays.add(marker)
                     }
 
+                    loadingText.visibility = View.GONE
                     map.invalidate()
                 }
             } catch (e: Exception) {
                 runOnUiThread {
                     Toast.makeText(this, "Virhe reittiä laskettaessa: ${e.message}", Toast.LENGTH_LONG).show()
+                    loadingText.visibility = View.GONE
                 }
             }
         }.start()
@@ -260,7 +282,6 @@ class KarttaActivity : BaseActivity() {
         start: GeoPoint,
         distanceKm: Double,
         bearingDegrees: Double,
-        context: Context
     ): GeoPoint? {
         val R = 6371.0
         val bearing = Math.toRadians(bearingDegrees)
@@ -277,7 +298,6 @@ class KarttaActivity : BaseActivity() {
         )
 
         val arvioituPiste = GeoPoint(Math.toDegrees(lat2), Math.toDegrees(lon2))
-        val roadManager = OSRMRoadManager(context, "TekoalyApp")
         roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
 
         val reitti = roadManager.getRoad(arrayListOf(start, arvioituPiste))
@@ -288,7 +308,7 @@ class KarttaActivity : BaseActivity() {
         val pisteet = reitti.mRouteHigh.filterIndexed { index, point ->
             if (index == 0) return@filterIndexed true
             val dist = point.distanceToAsDouble(reitti.mRouteHigh[index - 1])
-            dist > 3.0  // suodatetaan pois alle 5 metrin loikat
+            dist > 3.0  // suodatetaan pois alle 3 metrin loikat
         }
         for (i in 1 until pisteet.size) {
             val a = pisteet[i - 1]
