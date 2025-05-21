@@ -47,17 +47,26 @@ open abstract class BaseActivity : AppCompatActivity() {
         //Ylä menu toiminnallisuus
         navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.home -> {
+                R.id.nav_home -> {
                     startActivity(Intent(this, MainActivity::class.java))
                     true
                 }
-                R.id.map -> {
-                    startActivity(Intent(this, KarttaActivity::class.java))
+                R.id.nav_copyr -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, TekijanoikeudetFragment())
+                        .commit()
                     true
                 }
-
-                R.id.save -> {
-                    startActivity(Intent(this, MuistioActivity::class.java))
+                R.id.nav_info -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, TietoaSovelluksestaFragment())
+                        .commit()
+                    true
+                }
+                R.id.nav_license -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, KirjastotFragment())
+                        .commit()
                     true
                 }
                 else -> false

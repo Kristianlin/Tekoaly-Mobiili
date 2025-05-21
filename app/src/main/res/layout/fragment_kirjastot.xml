@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".KirjastotFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_img">
+
+        <TextView
+            android:id="@+id/kirjastootsikko"
+            android:layout_width="match_parent"
+            android:layout_height="104dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="Lisenssit ja avoimen lähdekoodin kirjastot"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtkirjastoa"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:text="Tämä sovellus hyödyntää kolmannen osapuolen avoimen lähdekoodin kirjastoja, jotka mahdollistavat reitityksen, karttojen näyttämisen ja muut tekniset toiminnot. Alla on listattu käytetyt kirjastot ja niiden lisenssit. Kiitämme tekijöitä arvokkaasta työstä!"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/kirjastootsikko" />
+
+        <TextView
+            android:id="@+id/txtkirjastob"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="5dp"
+            android:text="1. osmdroid
+Käyttötarkoitus: Karttanäkymän näyttäminen sovelluksessa, pohjakarttojen ja karttatasojen hallinta.
+Lisenssi: Apache License 2.0
+Projektin kotisivu: https://github.com/osmdroid/osmdroid"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtkirjastoa" />
+
+        <TextView
+            android:id="@+id/txtkirjastoc"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="5dp"
+            android:text="2. OSMBonusPack
+Käyttötarkoitus: Reititystoiminnot (esimerkiksi satunnaisen reitin laskenta), infokuplien näyttäminen kartalla ja muita lisätoiminnallisuuksia OpenStreetMapin hyödyntämiseen.
+Lisenssi: GNU Lesser General Public License (LGPL) v3
+Projektin kotisivu: https://github.com/MKergall/osmbonuspack"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtkirjastob" />
+
+        <ImageView
+            android:id="@+id/logok"
+            android:layout_width="201dp"
+            android:layout_height="196dp"
+            android:layout_marginStart="192dp"
+            android:layout_marginTop="48dp"
+            android:src="@drawable/logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtkirjastoc" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</FrameLayout>
