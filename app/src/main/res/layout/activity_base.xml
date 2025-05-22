@@ -41,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@drawable/background_img"
         app:menu="@menu/sivumenu"
         app:headerLayout="@layout/menunylapalkki" />
 
