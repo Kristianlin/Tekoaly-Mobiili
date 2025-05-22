@@ -30,6 +30,7 @@
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="Lisenssit ja avoimen lähdekoodin kirjastot"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"

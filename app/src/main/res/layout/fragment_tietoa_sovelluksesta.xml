@@ -28,10 +28,10 @@
             android:layout_height="104dp"
             android:gravity="center"
             android:text="Tietoa sovelluksesta"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteY="31dp" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/txtinfoa"
