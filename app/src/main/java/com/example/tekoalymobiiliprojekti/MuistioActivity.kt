@@ -21,6 +21,7 @@ class MuistioActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContent(R.layout.activity_muistio)
 
+        // Haetaan käyttöliittymän elementit XML-tiedostosta
         editText = findViewById(R.id.muistioEditText)
         val button = findViewById<Button>(R.id.tallennaButton)
         val clearButton = findViewById<Button>(R.id.tyhjennaButton)
@@ -28,21 +29,26 @@ class MuistioActivity : BaseActivity() {
         val dateTextView = findViewById<TextView>(R.id.valittuPaivaTextView)
         listView = findViewById(R.id.muistioListView)
 
+        // Yhdistetään lista ja sen sisältö adapteriin
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, merkinnat)
         listView.adapter = adapter
 
+        // Jaetaan muistioon tallennettu tieto käyttöön
         val sharedPref = getSharedPreferences("muistio", MODE_PRIVATE)
+
+        // Asetetaan kalenteri ja päivämääräformaatti
         val calendar = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
         loadAllEntries(sharedPref)
 
+        // Päivämäärän valintapainikkeen toiminta
         dateButton.setOnClickListener {
             DatePickerDialog(this,
                 { _, year, month, day ->
                     calendar.set(year, month, day)
                     selectedDate = dateFormat.format(calendar.time)
-                    dateTextView.text = "Valittu: $selectedDate"
+                    dateTextView.text = "Valittu: $selectedDate" // Näytetään käyttäjälle
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -50,6 +56,7 @@ class MuistioActivity : BaseActivity() {
             ).show()
         }
 
+        // Tallenna-painikkeen toiminta
         button.setOnClickListener {
             if (!::selectedDate.isInitialized) {
                 Toast.makeText(this, "Valitse ensin päivämäärä", Toast.LENGTH_SHORT).show()
@@ -62,6 +69,7 @@ class MuistioActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
+            // Muodostetaan uusi merkintä ja lisätään listan alkuun
             val uusiMerkinta = "$selectedDate: $teksti"
             merkinnat.add(0, uusiMerkinta)
             adapter.notifyDataSetChanged()
@@ -69,6 +77,7 @@ class MuistioActivity : BaseActivity() {
             editText.text.clear()
         }
 
+        // Tyhjennä kaikki -painikkeen toiminta
         clearButton.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Tyhjennä kaikki?")
@@ -84,11 +93,12 @@ class MuistioActivity : BaseActivity() {
         }
     }
 
-    // ✅ Tämä pitää olla onCreate:n ULKOPUOLELLA
+    // Tämä metodi palauttaa mikä nappi on aktiivinen alavalikossa (BaseActivity vaatii tämän)
     override fun getSelectedBottomNavItemId(): Int {
         return R.id.save // käytä oikeaa ID:tä navibarista, esim. R.id.navigation_muistio
     }
 
+    // Tallennetaan kaikki merkinnät SharedPreferences-muotoon (JSON-listana)
     private fun saveAllEntries(sharedPref: android.content.SharedPreferences) {
         val jsonArray = JSONArray()
         for (merkinta in merkinnat) {
@@ -97,6 +107,7 @@ class MuistioActivity : BaseActivity() {
         sharedPref.edit().putString("kaikki_merkinnat", jsonArray.toString()).apply()
     }
 
+    // Ladataan aiemmin tallennetut merkinnät muistista ja lisätään listaan
     private fun loadAllEntries(sharedPref: android.content.SharedPreferences) {
         merkinnat.clear()
         val savedJson = sharedPref.getString("kaikki_merkinnat", "[]")

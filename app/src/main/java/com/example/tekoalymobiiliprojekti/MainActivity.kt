@@ -24,56 +24,6 @@ class MainActivity : BaseActivity() {
 
         setContent(R.layout.activity_main)
 
-       /* binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        //menun avaus ja sulkeminen
-        val drawerLayout = binding.main
-        val toggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            binding.toolbar,
-            R.string.open_nav,
-            R.string.close_nav
-        )
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        binding.bottomNavigation.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.home -> {
-                    // Olet jo Home-aktiviteetissa
-                    true
-                }
-
-                R.id.map -> {
-                    val valittuAika: String = binding.aikaExt.text.toString()
-                    val valittuTahti = binding.tahtiSpinner.selectedItem.toString()
-
-                    val intentMatka = Intent(this, KarttaActivity::class.java).apply {
-                        if (valittuAika.isNotEmpty()) {
-                            putExtra("Aika", valittuAika.toDouble())
-                            putExtra("Tahti", valittuTahti)
-                        }
-                    }
-
-                    startActivity(intentMatka)
-                    overridePendingTransition(0, 0)
-                    finish()
-                    true
-                }
-
-                R.id.save -> {
-                    // Tulevaisuudessa: SaveActivity
-                    true
-                }
-
-                else -> false
-            }
-        }
-        // Asetetaan aloituspainike aktiiviseksi (korostaa sen navissa)
-        binding.bottomNavigation.selectedItemId = R.id.home*/
-
         //Alustukset
         aika = findViewById(R.id.aikaExt)
         reittiBtn = findViewById(R.id.laskeReittiBtn)
