@@ -1,29 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
+    <!-- Päivämäärävalinta + näytetty päivämäärä vierekkäin -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
 
-    <!-- Sisältöalue (muistio) -->
+        <Button
+            android:id="@+id/pvmButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valitse päivämäärä" />
+
+        <TextView
+            android:id="@+id/valittuPaivaTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ei päivämäärää valittu"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <!-- Tekstikenttä -->
     <EditText
         android:id="@+id/muistioEditText"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="top"
-        android:hint="Kirjoita muistiinpanosi tähän"
-        android:inputType="textMultiLine"
-        android:padding="16dp" />
+        android:layout_height="wrap_content"
+        android:hint="Kirjoita liikuntamerkintä"
+        android:inputType="text"
+        android:layout_marginBottom="8dp" />
 
-
+    <!-- Tallenna-nappi -->
     <Button
         android:id="@+id/tallennaButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="16dp"
-        android:text="Tallenna" />
+        android:text="Tallenna"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="12dp" />
 
+    <!-- Lista merkinnöistä laatikossa -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:clipToPadding="false">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Merkinnät"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <ListView
+            android:id="@+id/muistioListView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:dividerHeight="8dp" />
+    </LinearLayout>
+
+    <!-- Tyhjennä kaikki -painike lisätty -->
+    <Button
+        android:id="@+id/tyhjennaButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tyhjennä kaikki"
+        android:layout_marginBottom="4dp" />
 </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
