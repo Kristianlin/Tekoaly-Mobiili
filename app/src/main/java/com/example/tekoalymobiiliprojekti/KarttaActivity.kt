@@ -1,26 +1,18 @@
 package com.example.tekoalymobiiliprojekti
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import com.google.gson.JsonParser
-import org.osmdroid.views.overlay.Polyline
 import android.Manifest // manifestiin lisätty luvat -Henry
-import android.content.Intent
 import android.content.pm.PackageManager // -Henry
 import android.widget.TextView
 import androidx.core.app.ActivityCompat // -Henry
 import com.example.tekoalymobiiliprojekti.databinding.ActivityKarttaBinding
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay // sijainnin hakemiseen -Henry
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider // -Henry
-import com.example.tekoalymobiiliprojekti.databinding.ActivityMainBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
@@ -28,68 +20,41 @@ import android.widget.Toast
 import android.graphics.Color
 import kotlin.math.*
 import kotlin.random.Random
-import android.content.Context
 import java.util.ArrayList
 import androidx.core.content.ContextCompat
 import android.widget.Button
 import android.view.View
 
-
-
 class KarttaActivity : BaseActivity() {
-
-    private val greetings = listOf(
-        "Liikkumisen iloa!",
-        "Avoimin mielin, kevein askelin!",
-        "Hyvää treeniä!",
-        "Sinä liikut, kehosi kiittää!",
-        "Tsemppiä reitille!"
-    )
 
     private lateinit var map: MapView
     lateinit var kilometrit : TextView
-    private lateinit var binding: ActivityKarttaBinding
-
     private lateinit var roadManager: OSRMRoadManager
     private lateinit var loadingText: TextView
 
+    // Navigoitivalikko aktiiviseksi
     override fun getSelectedBottomNavItemId(): Int = R.id.map
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_kartta)
         setContent(R.layout.activity_kartta)
 
+        // Valitaan satunnainen tervehdystekstit
         val greeting = greetings.random()  //tervehdys toiminta
         val greetingText = findViewById<TextView>(R.id.greetingText)
         greetingText.text = greeting
 
-        /*val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        bottomNav.selectedItemId = R.id.map
-
-        bottomNav.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.map -> true // Olet jo täällä
-                R.id.home -> {
-                    startActivity(Intent(this, MainActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    finish()
-                    true
-                }
-                else -> false
-            }
-        }*/
-
+        // Ladataan osmdroidin asetukset
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
 
+        // Alustetaan reittien hallitsija ja valitaan kävelyreitti
         roadManager = OSRMRoadManager(this, "TekoalyApp")
         roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
 
-
+        // Asetetaan kartta
         map = findViewById(R.id.mapView3)
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setBuiltInZoomControls(true)
         map.setMultiTouchControls(true)
-
         val mapController = map.controller
         mapController.setZoom(13.0)
 
@@ -108,13 +73,13 @@ class KarttaActivity : BaseActivity() {
         val btnTyhjenna = findViewById<Button>(R.id.btnTyhjenna)
         loadingText = findViewById(R.id.loadingText)
 
+        // Painikkeet uutta reittiä ja tyhjennystä varten
         btnHaeUusi.setOnClickListener {
             map.overlays.clear()
             map.invalidate()
             loadingText.visibility = View.VISIBLE
             setupMyLocation()
         }
-
         btnTyhjenna.setOnClickListener {
             map.overlays.clear()
             map.invalidate()
@@ -186,6 +151,7 @@ class KarttaActivity : BaseActivity() {
                 return@runOnFirstFix
             }
 
+            // Etsitään useita reittejä satunnaisiin suuntiin
             val numberOfCandidates = 8
             repeat(numberOfCandidates) {
                 val angle1 = Random.nextDouble(0.0, 360.0)
@@ -251,7 +217,7 @@ class KarttaActivity : BaseActivity() {
                         startMarker.title = "Lähtöpiste"
                         startMarker.snippet = "Tämä on lähtö- ja paluupiste"
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        //startMarker.icon = ContextCompat.getDrawable(this, R.drawable.start_flag)
+                        startMarker.icon = ContextCompat.getDrawable(this, R.drawable.img_flag)
                         map.overlays.add(startMarker)
                     }
 
@@ -330,7 +296,8 @@ class KarttaActivity : BaseActivity() {
         val vauhtiMap = mapOf(
             "Rauhallisesti" to 4.0,  // km/h
             "Verkkaasti" to 6.0,
-            "Juosten" to 10.0
+            "Juosten" to 10.0,
+            "Pyöräillen" to 18.0
         )
 
         val nopeus = vauhtiMap[tahti]
@@ -347,4 +314,12 @@ class KarttaActivity : BaseActivity() {
             return 0.0
         }
     }
+    // Tervehdystekstit
+    private val greetings = listOf(
+        "Liikkumisen iloa!",
+        "Avoimin mielin, kevein askelin!",
+        "Hyvää treeniä!",
+        "Sinä liikut, kehosi kiittää!",
+        "Tsemppiä reitille!"
+    )
 }
