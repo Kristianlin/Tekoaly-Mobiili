@@ -29,7 +29,12 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="#212121"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="12dp"
+                android:fontFamily="monospace"
+                android:shadowColor="#009688"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="1" />
 
             <TextView
                 android:id="@+id/textView5"
@@ -38,7 +43,13 @@
                 android:text="Kuinka kauan haluat lenkin kestävän?"
                 android:textColor="#424242"
                 android:textSize="16sp"
-                android:layout_marginTop="12dp"/>
+                android:layout_marginTop="24dp"
+                android:fontFamily="monospace"
+                android:shadowColor="#009688"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="100"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/aikaExt"
@@ -48,8 +59,10 @@
                 android:inputType="number"
                 android:background="@drawable/input_background"
                 android:padding="12dp"
-                android:layout_marginTop="6dp"
-                android:textColor="#000000"/>
+                android:layout_marginTop="16dp"
+                android:textColor="#000000"
+                android:fontFamily="monospace"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/textView4"
@@ -58,14 +71,20 @@
                 android:text="Millaisella tahdilla jaksat tänään mennä?"
                 android:textColor="#424242"
                 android:textSize="16sp"
-                android:layout_marginTop="16dp"/>
+                android:layout_marginTop="32dp"
+                android:fontFamily="monospace"
+                android:shadowColor="#009688"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="100"
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/tahtiSpinner"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:background="@drawable/spinner_background"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="16dp" />
 
             <Button
                 android:id="@+id/laskeReittiBtn"
@@ -73,11 +92,16 @@
                 android:layout_height="wrap_content"
                 android:text="Laske reitti"
                 android:textStyle="bold"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="32dp"
                 android:background="@drawable/btn_background"
                 android:textColor="#FFFFFF"
                 android:elevation="6dp"
-                android:stateListAnimator="@null"/>
+                android:stateListAnimator="@null"
+                android:shadowColor="#009688"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="100"
+                android:fontFamily="monospace"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
